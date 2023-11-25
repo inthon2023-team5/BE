@@ -32,25 +32,7 @@ export class UserService {
   async findByUnivId(univId: string): Promise<UserEntity> {
     return await this.userRepo.findOne({ where: { univId: univId } });
   }
-  /*
-  async getProfileById(id: number): Promise<ProfileDto> {
-    const user = await this.userRepo.findOne({ where: { id } });
-
-    const top3 = await this.matchRepo
-      .createQueryBuilder('match')
-      .select('match.category', 'category')
-      .addSelect('COUNT(*)', 'count')
-      .where('match.answer_user = :user', { user: user })
-      .andWhere('match.state = 3')
-      .groupBy('match.category')
-      .having('COUNT(*) >= 5')
-      .orderBy('count', 'DESC')
-      .limit(3)
-      .getRawMany();
-
-    return ProfileDto.ToDto(user, top3);
-  }
-*/
+  
   async signupUser(user: SignupDto) {
     const { name, nickname, email, univId, grade, password } = user;
     if (await this.findByUnivId(univId)) {

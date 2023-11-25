@@ -1,7 +1,7 @@
 import { Controller, Post, Body, Res } from '@nestjs/common';
 import { SignupDto, LoginDto, UserDto } from 'src/user/dtos/user.dto';
 import { Response } from 'express';
-import { ApiTags, ApiBody, ApiOperation } from '@nestjs/swagger';
+import { ApiTags, ApiBody, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { UserService } from 'src/user/user.service';
 
 @Controller('auth')
@@ -37,6 +37,10 @@ export class AuthController {
     summary: '로그인',
     description: '로그인 진행 후 토큰 및 정보 반환',
   })
+  @ApiResponse({
+    description: '토큰 및 정보 반환',
+    type: UserDto,
+  })
   async login(@Body() loginUser: LoginDto, @Res() res: Response) {
     try {
       const { univId } = loginUser;
@@ -56,7 +60,11 @@ export class AuthController {
   })
   @ApiOperation({
     summary: '닉네임 중복 확인',
-    description: 'true/false 반환',
+    description: '중복 확인 후 반환',
+  })
+  @ApiResponse({
+    description: 'false/true',
+    type: Boolean,
   })
   async checkNickname(@Body() nickname: string, @Res() res: Response) {
     const unique = await this.userService.findByNickname(nickname);
