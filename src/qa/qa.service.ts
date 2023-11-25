@@ -62,8 +62,13 @@ export class QaService {
 
   async changeQaState(id: number, state: State) {
     if (state == 3) {
-      const qaEntity = await this.matchRepo.findOne({ where: { id: id } });
-      //await this.userService.updatePoint(qaEntity.question_user.id, 10);
+      const qaEntity = await this.matchRepo.findOne({
+        where: { id: id },
+        relations: ['answer_user'],
+      });
+      console.log(qaEntity.id, id);
+      await this.userService.updatePoint(qaEntity.answer_user.id, 10);
+      await this.userService.updateRank(qaEntity.answer_user.id);
     }
     this.matchRepo.update(id, { state: state });
   }
@@ -104,12 +109,13 @@ export class QaService {
   }
 
   async postQaChat(qaChat: QaChatDto, userId: number) {
-    const { isQuestion, chat, qaId } = qaChat;
+    const { isQuestion, chat, qaId, questionId } = qaChat;
     const qaChatEntity = await this.chatRepo.create({
       isQuestion: isQuestion,
       chat: chat,
       qaMatch: qaId,
       user: userId,
+      questionId: questionId ?? null,
       createdAt: new Date(new Date().getTime() + 9 * 60 * 60 * 1000),
     } as DeepPartial<qaChatEntity>);
     const ChatEntity = await this.chatRepo.save(qaChatEntity);

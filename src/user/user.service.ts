@@ -89,6 +89,19 @@ export class UserService {
     return await this.userRepo.save(user);
   }
 
+  async updateRank(id: number) {
+    const user = await this.userRepo.findOne({ where: { id: id } });
+    const answeredQAs = await this.matchRepo.find({
+      where: { answer_user: user, state: 3 },
+    });
+    const rank = Math.floor(answeredQAs.length / 4);
+    if (rank > 14) return false;
+
+    user.rank = rank;
+    await this.userRepo.save(user);
+    return rank;
+  }
+
   async getUserQuestion(userId: number) {
     const user = await this.userRepo.findOne({ where: { id: userId } });
     const questions = await this.matchRepo.find({

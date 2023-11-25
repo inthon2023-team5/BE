@@ -16,11 +16,13 @@ import {
   ApiResponse,
   ApiCreatedResponse,
   ApiBody,
+  ApiParam,
 } from '@nestjs/swagger';
 import { QaService } from './qa.service';
 import { JwtPayload } from 'src/interfaces/jwt.payload';
 import { QuestionDto, QuestionListDto } from './dtos/question.dto';
 import { Category } from 'src/common/enums';
+import { QaChatDto } from './dtos/chat.dto';
 
 @Controller('qa')
 @ApiTags('Q&A')
@@ -149,6 +151,58 @@ export class QaController {
       const { qaId } = info;
       this.qaService.changeQaState(qaId, 3);
       return res.sendStatus(201);
+    } catch (error) {
+      console.log(error);
+      return res.status(error.status).json(error);
+    }
+  }
+
+  @UseGuards(AuthGuard('access'))
+  @Get('/chat/:qaId')
+  @ApiOperation({
+    summary: 'Q&A 상세',
+    description: 'Q&A 채팅 내역',
+  })
+  @ApiParam({
+    name: 'qaId',
+    type: Number,
+  })
+  @ApiCreatedResponse({ description: 'success' })
+  async getQaChat(
+    @Req() req: Request,
+    @Param('qaId') qaId: number,
+    @Res() res: Response,
+  ) {
+    const { id } = req.user as JwtPayload;
+    try {
+      const chats = await this.qaService.getQaChats(qaId);
+      return res.json(chats);
+    } catch (error) {
+      console.log(error);
+      return res.status(error.status).json(error);
+    }
+  }
+
+  @UseGuards(AuthGuard('access'))
+  @Get('/chat/:qaId')
+  @ApiOperation({
+    summary: 'Q&A 채팅',
+    description: 'Q&A 채팅 보내기',
+  })
+  @ApiBody({
+    description: '채팅 내용',
+    type: QaChatDto,
+  })
+  @ApiCreatedResponse({ description: 'success' })
+  async postQaChat(
+    @Req() req: Request,
+    @Body() qaChatDto: QaChatDto,
+    @Res() res: Response,
+  ) {
+    const { id } = req.user as JwtPayload;
+    try {
+      const chats = await this.qaService.postQaChat(qaChatDto, id);
+      return res.json(chats);
     } catch (error) {
       console.log(error);
       return res.status(error.status).json(error);
