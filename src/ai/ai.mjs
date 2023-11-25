@@ -94,8 +94,8 @@ const run = async (question) => {
     // 12. Initialize the OpenAI language model
     const model = new OpenAI({
       modelName: 'gpt-3.5-turbo', //gpt-3.5-turbo-instruct로 교체 가능
-      temperature: 0.2,
-      openAIApiKey: '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',
+      temperature: 0.8,
+      openAIApiKey: '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',
     });
 
     let vectorStore;
@@ -108,7 +108,7 @@ const run = async (question) => {
       vectorStore = await HNSWLib.load(
         VECTOR_STORE_PATH,
         new OpenAIEmbeddings({
-          openAIApiKey: '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',
+          openAIApiKey: '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',
         }),
       );
       console.log('Vector store loaded.');
@@ -125,7 +125,7 @@ const run = async (question) => {
       vectorStore = await HNSWLib.fromDocuments(
         splitDocs,
         new OpenAIEmbeddings({
-          openAIApiKey: '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',
+          openAIApiKey: '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',
         }),
       );
       // 17. Save the vector store to the specified path
@@ -151,4 +151,4 @@ const run = async (question) => {
 
 export { run };
 // 21. Run the main function
-// run('컴퓨터학과에서 실리콘밸리에 가는 법이 있나요');
+run('컴퓨터학과에서 실리콘밸리에 가는 법이 있나요?');
