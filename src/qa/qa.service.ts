@@ -44,6 +44,8 @@ export class QaService {
       },
       questionUser,
     );
+
+    return qaMatchEntity.id;
   }
 
   async startAnswer(id: number, answerUser: number) {

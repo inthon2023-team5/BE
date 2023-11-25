@@ -88,8 +88,8 @@ export class QaController {
     @Res() res: Response,
   ) {
     const { id } = req.user as JwtPayload;
-    this.qaService.postQuestion(questionDto, id);
-    return res.sendStatus(201);
+    const qaId = await this.qaService.postQuestion(questionDto, id);
+    return res.status(201).json({ id: qaId });
   }
 
   @UseGuards(AuthGuard('access'))
