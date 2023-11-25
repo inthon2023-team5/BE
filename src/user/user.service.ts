@@ -32,7 +32,7 @@ export class UserService {
   async findByUnivId(univId: string): Promise<UserEntity> {
     return await this.userRepo.findOne({ where: { univId: univId } });
   }
-  
+
   async signupUser(user: SignupDto) {
     const { name, nickname, email, univId, grade, password } = user;
     if (await this.findByUnivId(univId)) {
@@ -55,18 +55,18 @@ export class UserService {
 
   async loginUser(loginUser: LoginDto) {
     const { univId, password } = loginUser;
-    const user = await this.userRepo.findOne({
+    const user = await this.userRepo.find({
       where: { univId: univId },
     });
 
     if (
       !user ||
       user == undefined ||
-      (await !bcrypt.compare(password, user.password))
+      (await !bcrypt.compare(password, user[0].password))
     ) {
       throw new UnauthorizedException();
     }
-    return await this.getToken(user.id);
+    return await this.getToken(user[0].id);
   }
 
   async getToken(userId: number) {
