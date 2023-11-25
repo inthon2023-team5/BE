@@ -3,9 +3,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { QaController } from './qa.controller';
 import { QaService } from './qa.service';
 import { qaChatEntity, qaMatchingEntity } from 'src/entities';
+import { UserModule } from 'src/user/user.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([qaMatchingEntity, qaChatEntity])],
+  imports: [
+    UserModule,
+    TypeOrmModule.forFeature([qaMatchingEntity, qaChatEntity]),
+  ],
   controllers: [QaController],
   providers: [QaService],
   exports: [QaService],

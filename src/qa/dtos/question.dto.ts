@@ -1,16 +1,12 @@
 import { IsEnum, IsString, IsNumber, IsDate } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, PickType } from '@nestjs/swagger';
 import { qaMatchingEntity } from 'src/entities';
 import { Category } from 'src/common/enums';
 
-export class QuestionDto {
+export class QADto {
   @IsNumber()
   @ApiProperty({ description: 'Q&A id' })
   id: number;
-
-  @IsString()
-  @ApiProperty({ description: 'nickname' })
-  nickname: string;
 
   @IsString()
   @ApiProperty({ description: 'question' })
@@ -23,8 +19,14 @@ export class QuestionDto {
   @IsDate()
   @ApiProperty({ description: 'createdAt' })
   createdAt: Date;
+}
 
-  static ToDto(qaEntity: qaMatchingEntity): QuestionDto {
+export class QuestionListDto extends QADto {
+  @IsString()
+  @ApiProperty({ description: 'nickname' })
+  nickname: string;
+
+  static ToDto(qaEntity: qaMatchingEntity): QuestionListDto {
     return {
       id: qaEntity.id,
       nickname: qaEntity.question_user.nickname,
@@ -34,3 +36,8 @@ export class QuestionDto {
     };
   }
 }
+
+export class QuestionDto extends PickType(QADto, [
+  'question',
+  'category',
+] as const) {}

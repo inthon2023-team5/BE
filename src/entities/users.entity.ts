@@ -1,4 +1,4 @@
-import { Grade } from 'src/common/enums';
+import { Grade, Rank } from 'src/common/enums';
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
 @Entity()
@@ -26,6 +26,13 @@ export class UserEntity {
     enum: Grade,
   })
   grade: Grade;
+
+  @Column({
+    type: 'enum',
+    enum: Rank,
+    default: 0,
+  })
+  rank: Rank;
 
   @Column()
   point: number;

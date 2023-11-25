@@ -32,4 +32,14 @@ export class AuthController {
       return res.send(error);
     }
   }
+
+  @Post('/checkNickname')
+  async checkNickname(@Body() nickname: string, @Res() res: Response) {
+    const unique = await this.userService.findByNickname(nickname);
+    if (unique) {
+      return res.send(false);
+    } else {
+      return res.send(true);
+    }
+  }
 }

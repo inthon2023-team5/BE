@@ -7,15 +7,17 @@ import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from 'src/interfaces/jwt.payload';
-import { UserEntity } from 'src/entities';
+import { UserEntity, qaMatchingEntity } from 'src/entities';
 import { Repository } from 'typeorm';
-import { SignupDto, LoginDto } from './dtos/user.dto';
+import { SignupDto, LoginDto, ProfileDto } from './dtos/user.dto';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(UserEntity)
     private readonly userRepo: Repository<UserEntity>,
+    @InjectRepository(qaMatchingEntity)
+    private readonly matchRepo: Repository<qaMatchingEntity>,
     private readonly jwtService: JwtService,
   ) {}
 
@@ -23,8 +25,30 @@ export class UserService {
     return await this.userRepo.findOne({ where: { id } });
   }
 
+  async findByNickname(nickname: string): Promise<UserEntity> {
+    return await this.userRepo.findOne({ where: { nickname: nickname } });
+  }
+
   async findByUnivId(univId: string): Promise<UserEntity> {
     return await this.userRepo.findOne({ where: { univId: univId } });
+  }
+
+  async getProfileById(id: number): Promise<ProfileDto> {
+    const user = await this.userRepo.findOne({ where: { id } });
+
+    const top3 = await this.matchRepo
+      .createQueryBuilder('match')
+      .select('match.category', 'category')
+      .addSelect('COUNT(*)', 'count')
+      .where('match.answer_user = :user', { user: user })
+      .andWhere('match.state = 3')
+      .groupBy('match.category')
+      .having('COUNT(*) >= 5')
+      .orderBy('count', 'DESC')
+      .limit(3)
+      .getRawMany();
+
+    return ProfileDto.ToDto(user, top3);
   }
 
   async signupUser(user: SignupDto) {
@@ -38,6 +62,7 @@ export class UserService {
       email: email,
       univId: univId,
       grade: grade,
+      rank: 0,
       password: await bcrypt.hash(password, 10),
       point: 100,
     });
