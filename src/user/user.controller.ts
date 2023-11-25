@@ -18,4 +18,12 @@ export class UserController {
     const user = await this.userService.findById(id);
     return res.json(UserDto.ToDto(user));
   }
+
+  @UseGuards(AuthGuard('access'))
+  @Get('/qalist')
+  async userQalist(@Req() req: Request, @Res() res: Response) {
+    const { id } = req.user as JwtPayload;
+    const user = await this.userService.findById(id);
+    return res.json(UserDto.ToDto(user));
+  }
 }
