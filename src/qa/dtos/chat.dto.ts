@@ -1,4 +1,4 @@
-import { IsString, IsNumber, IsBoolean } from 'class-validator';
+import { IsString, IsNumber, IsBoolean, ValidateIf } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class QaChatDto {
@@ -14,6 +14,7 @@ export class QaChatDto {
   @ApiProperty({ description: 'Q or not' })
   isQuestion: boolean;
 
+  @ValidateIf((o) => o.questionId != null)
   @IsNumber()
   @ApiProperty({ description: 'question id for professor' })
   questionId: number;
