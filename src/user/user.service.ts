@@ -32,7 +32,7 @@ export class UserService {
   async findByUnivId(univId: string): Promise<UserEntity> {
     return await this.userRepo.findOne({ where: { univId: univId } });
   }
-
+  /*
   async getProfileById(id: number): Promise<ProfileDto> {
     const user = await this.userRepo.findOne({ where: { id } });
 
@@ -50,15 +50,16 @@ export class UserService {
 
     return ProfileDto.ToDto(user, top3);
   }
-
+*/
   async signupUser(user: SignupDto) {
-    const { name, email, univId, grade, password } = user;
+    const { name, nickname, email, univId, grade, password } = user;
     if (await this.findByUnivId(univId)) {
       throw new HttpException('duplicated univId', 409);
     }
 
     const newUser = await this.userRepo.create({
       name: name,
+      nickname: nickname,
       email: email,
       univId: univId,
       grade: grade,

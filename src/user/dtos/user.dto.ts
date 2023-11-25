@@ -8,7 +8,7 @@ import {
 } from 'class-validator';
 import { ApiProperty, PickType, OmitType } from '@nestjs/swagger';
 import { UserEntity } from 'src/entities';
-import { Category, Grade } from 'src/common/enums';
+import { Category, Grade, Rank } from 'src/common/enums';
 
 export class UserDto {
   @IsString()
@@ -31,6 +31,10 @@ export class UserDto {
   @ApiProperty({ description: 'grade' })
   grade: Grade;
 
+  @IsEnum(Rank)
+  @ApiProperty({ description: 'rank' })
+  rank: Rank;
+
   @IsNumber()
   @ApiProperty({ description: 'point' })
   point: number;
@@ -42,6 +46,7 @@ export class UserDto {
       email: user.email,
       univId: user.univId,
       grade: user.grade,
+      rank: user.rank,
       point: user.point,
     };
   }
