@@ -21,10 +21,23 @@ import models from '@dqbd/tiktoken/model_to_encoding.json' assert { type: 'json'
 // 4. Import dotenv for loading environment variables and fs for file system operations
 import dotenv from 'dotenv';
 import fs from 'fs';
+// import path from 'path';
+// const dirPath = path.resolve(__dirname, './documents');
+
+import { fileURLToPath } from 'url';
+import path from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const projectRoot = path.resolve(__dirname, '../../'); // Adjust this path as necessary
+const dirPath = path.resolve(projectRoot, './src/ai/documents');
+const dirPath2 = path.resolve(projectRoot, './src/ai/Documents.index');
+
 dotenv.config();
 
+console.log(process.env.OPENAI_API_KEY);
 // 5. Initialize the document loader with supported file formats
-const loader = new DirectoryLoader('./documents', {
+const loader = await new DirectoryLoader(dirPath, {
   '.json': (path) => new JSONLoader(path),
   '.txt': (path) => new TextLoader(path),
   '.csv': (path) => new CSVLoader(path),
@@ -54,8 +67,9 @@ async function calculateCost() {
   return cost;
 }
 
-const VECTOR_STORE_PATH = 'Documents.index';
-const question = 'Tell me about these docs';
+// const VECTOR_STORE_PATH = 'Documents.index';
+const VECTOR_STORE_PATH = dirPath2;
+// const question = '이 문서에 대해 알려줘';
 
 // 8. Define a function to normalize the content of the documents
 function normalizeDocuments(docs) {
@@ -69,7 +83,7 @@ function normalizeDocuments(docs) {
 }
 
 // 9. Define the main function to run the entire process
-export const run = async () => {
+const run = async (question) => {
   // 10. Calculate the cost of tokenizing the documents
   console.log('Calculating cost...');
   const cost = await calculateCost();
@@ -78,7 +92,11 @@ export const run = async () => {
   // 11. Check if the cost is within the acceptable limit
   if (cost <= 1) {
     // 12. Initialize the OpenAI language model
-    const model = new OpenAI({});
+    const model = new OpenAI({
+      modelName: 'gpt-3.5-turbo', //gpt-3.5-turbo-instruct로 교체 가능
+      temperature: 0.2,
+      openAIApiKey: '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',
+    });
 
     let vectorStore;
 
@@ -89,7 +107,9 @@ export const run = async () => {
       console.log('Loading existing vector store...');
       vectorStore = await HNSWLib.load(
         VECTOR_STORE_PATH,
-        new OpenAIEmbeddings(),
+        new OpenAIEmbeddings({
+          openAIApiKey: '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',
+        }),
       );
       console.log('Vector store loaded.');
     } else {
@@ -104,7 +124,9 @@ export const run = async () => {
       // 16. Generate the vector store from the documents
       vectorStore = await HNSWLib.fromDocuments(
         splitDocs,
-        new OpenAIEmbeddings(),
+        new OpenAIEmbeddings({
+          openAIApiKey: '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',
+        }),
       );
       // 17. Save the vector store to the specified path
       await vectorStore.save(VECTOR_STORE_PATH);
@@ -120,11 +142,13 @@ export const run = async () => {
     console.log('Querying chain...');
     const res = await chain.call({ query: question });
     console.log({ res });
+    return res;
   } else {
     // 20. If the cost exceeds the limit, skip the embedding process
     console.log('The cost of embedding exceeds $1. Skipping embeddings.');
   }
 };
 
+export { run };
 // 21. Run the main function
-run();
+// run('컴퓨터학과에서 실리콘밸리에 가는 법이 있나요');
