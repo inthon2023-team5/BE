@@ -1,7 +1,14 @@
-import { IsEmail, IsEnum, IsString, IsNumber } from 'class-validator';
+import {
+  IsEmail,
+  IsEnum,
+  IsString,
+  IsNumber,
+  IsArray,
+  ValidateIf,
+} from 'class-validator';
 import { ApiProperty, PickType, OmitType } from '@nestjs/swagger';
 import { UserEntity } from 'src/entities';
-import { Grade } from 'src/common/enums';
+import { Category, Grade, Rank } from 'src/common/enums';
 
 export class UserDto {
   @IsString()
@@ -24,6 +31,10 @@ export class UserDto {
   @ApiProperty({ description: 'grade' })
   grade: Grade;
 
+  @IsEnum(Rank)
+  @ApiProperty({ description: 'rank' })
+  rank: Rank;
+
   @IsNumber()
   @ApiProperty({ description: 'point' })
   point: number;
@@ -35,6 +46,7 @@ export class UserDto {
       email: user.email,
       univId: user.univId,
       grade: user.grade,
+      rank: user.rank,
       point: user.point,
     };
   }
@@ -50,3 +62,27 @@ export class LoginDto extends PickType(SignupDto, [
   'univId',
   'password',
 ] as const) {}
+
+export class ProfileDto extends PickType(UserDto, [
+  'nickname',
+  'grade',
+] as const) {
+  @ValidateIf((o) => o.top3 !== undefined && o.top3 !== null)
+  @IsArray()
+  @IsEnum(Category, { each: true })
+  @ApiProperty({
+    description: 'top3',
+    enum: Category,
+    enumName: 'Category',
+    isArray: true,
+  })
+  top3: Category[];
+
+  static ToDto(user: UserEntity, top3: Category[]): ProfileDto {
+    return {
+      nickname: user.nickname,
+      grade: user.grade,
+      top3: top3 ?? [],
+    };
+  }
+}

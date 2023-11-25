@@ -19,6 +19,7 @@ export class qaMatchingEntity {
   @Column({
     type: 'enum',
     enum: State,
+    default: 0,
   })
   state: State;
 

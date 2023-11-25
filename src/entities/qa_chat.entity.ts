@@ -1,4 +1,3 @@
-import { QA } from 'src/common/enums';
 import { UserEntity } from './users.entity';
 import {
   Entity,
@@ -14,21 +13,26 @@ export class qaChatEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column()
+  isQuestion: boolean;
+
   @Column({
-    type: 'enum',
-    enum: QA,
+    nullable: true,
   })
-  qa: QA;
+  questionId?: number;
 
   @Column()
   chat: string;
+
+  @Column()
+  createdAt: Date;
 
   @ManyToOne(() => qaMatchingEntity, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   })
   @JoinColumn()
-  qaRoom: qaMatchingEntity;
+  qaMatch: qaMatchingEntity;
 
   @ManyToOne(() => UserEntity, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
   @JoinColumn()
