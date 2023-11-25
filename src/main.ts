@@ -7,8 +7,8 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   const swaggerConfig = new DocumentBuilder()
-    .setTitle('BLURTING API')
-    .setDescription('API for BLURTING service')
+    .setTitle('INTHON API')
+    .setDescription('API for INTHON service')
     .setVersion('1.0')
     .build();
 

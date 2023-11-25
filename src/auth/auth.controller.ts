@@ -1,7 +1,7 @@
 import { Controller, Post, Body, Res } from '@nestjs/common';
 import { SignupDto, LoginDto, UserDto } from 'src/user/dtos/user.dto';
 import { Response } from 'express';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiTags, ApiBody, ApiOperation } from '@nestjs/swagger';
 import { UserService } from 'src/user/user.service';
 
 @Controller('auth')
@@ -10,6 +10,14 @@ export class AuthController {
   constructor(private readonly userService: UserService) {}
 
   @Post('/signup')
+  @ApiBody({
+    description: '유저 정보',
+    type: SignupDto,
+  })
+  @ApiOperation({
+    summary: '회원가입',
+    description: '회원가입 진행',
+  })
   async signup(@Body() signupUser: SignupDto, @Res() res: Response) {
     try {
       await this.userService.signupUser(signupUser);
@@ -21,6 +29,14 @@ export class AuthController {
   }
 
   @Post('/login')
+  @ApiBody({
+    description: '유저 정보',
+    type: LoginDto,
+  })
+  @ApiOperation({
+    summary: '로그인',
+    description: '로그인 진행 후 토큰 및 정보 반환',
+  })
   async login(@Body() loginUser: LoginDto, @Res() res: Response) {
     try {
       const { univId } = loginUser;
@@ -34,6 +50,14 @@ export class AuthController {
   }
 
   @Post('/checkNickname')
+  @ApiBody({
+    description: '닉네임',
+    type: String,
+  })
+  @ApiOperation({
+    summary: '닉네임 중복 확인',
+    description: 'true/false 반환',
+  })
   async checkNickname(@Body() nickname: string, @Res() res: Response) {
     const unique = await this.userService.findByNickname(nickname);
     if (unique) {
