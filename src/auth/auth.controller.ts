@@ -66,7 +66,8 @@ export class AuthController {
     description: 'false/true',
     type: Boolean,
   })
-  async checkNickname(@Body() nickname: string, @Res() res: Response) {
+  async checkNickname(@Body() info, @Res() res: Response) {
+    const { nickname } = info;
     const unique = await this.userService.findByNickname(nickname);
     if (unique) {
       return res.send(false);
