@@ -36,6 +36,7 @@ const dirPath2 = path.resolve(projectRoot, './src/ai/Documents.index');
 dotenv.config();
 
 console.log(process.env.OPENAI_API_KEY);
+
 // 5. Initialize the document loader with supported file formats
 const loader = await new DirectoryLoader(dirPath, {
   '.json': (path) => new JSONLoader(path),
@@ -83,7 +84,7 @@ function normalizeDocuments(docs) {
 }
 
 // 9. Define the main function to run the entire process
-const run = async (question) => {
+const run = async (question, OPENAI_API_KEY) => {
   // 10. Calculate the cost of tokenizing the documents
   console.log('Calculating cost...');
   const cost = await calculateCost();
@@ -94,10 +95,10 @@ const run = async (question) => {
     // 12. Initialize the OpenAI language model
     const model = new OpenAI({
       modelName: 'gpt-3.5-turbo', //gpt-3.5-turbo-instruct로 교체 가능
-      temperature: 0.8,
-      openAIApiKey: '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',
+      temperature: 0.2,
+      openAIApiKey: OPENAI_API_KEY,
     });
-
+    // console.log(process.env.OPENAI_API_KEY);
     let vectorStore;
 
     // 13. Check if an existing vector store is available
@@ -108,7 +109,7 @@ const run = async (question) => {
       vectorStore = await HNSWLib.load(
         VECTOR_STORE_PATH,
         new OpenAIEmbeddings({
-          openAIApiKey: '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',
+          openAIApiKey: OPENAI_API_KEY,
         }),
       );
       console.log('Vector store loaded.');
@@ -125,7 +126,7 @@ const run = async (question) => {
       vectorStore = await HNSWLib.fromDocuments(
         splitDocs,
         new OpenAIEmbeddings({
-          openAIApiKey: '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',
+          openAIApiKey: OPENAI_API_KEY,
         }),
       );
       // 17. Save the vector store to the specified path
@@ -151,4 +152,4 @@ const run = async (question) => {
 
 export { run };
 // 21. Run the main function
-run('컴퓨터학과에서 실리콘밸리에 가는 법이 있나요?');
+// run('컴퓨터학과에서 실리콘밸리에 가는 법이 있나요?');

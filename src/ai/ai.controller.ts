@@ -12,8 +12,12 @@ export class AiController {
   async startAI(@Res() res: Response, @Req() req: Request) {
     let answer: any;
     const { question } = req.body;
+
+    // await import('./updateVector.mjs').then(async (updateVectorModule) => {
+    //   await updateVectorModule.updateVector(process.env.OPENAI_API_KEY);
+    // });
     await import('./ai.mjs').then(async (aiModule) => {
-      answer = await aiModule.run(question);
+      answer = await aiModule.run(question, process.env.OPENAI_API_KEY);
     });
     console.log(answer);
     res.send(answer);

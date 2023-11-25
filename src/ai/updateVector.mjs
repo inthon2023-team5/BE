@@ -55,7 +55,7 @@ function normalizeDocuments(docs) {
   });
 }
 
-const updateVector = async () => {
+const updateVector = async (OPENAI_API_KEY) => {
   // 15. Create a new vector store if one does not exist
   console.log('Creating new vector store...');
   const textSplitter = new RecursiveCharacterTextSplitter({
@@ -68,7 +68,7 @@ const updateVector = async () => {
   vectorStore = await HNSWLib.fromDocuments(
     splitDocs,
     new OpenAIEmbeddings({
-      openAIApiKey: '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',
+      openAIApiKey: OPENAI_API_KEY,
     }),
   );
   // 17. Save the vector store to the specified path
@@ -76,5 +76,6 @@ const updateVector = async () => {
 
   console.log('Vector store created.');
 };
-await updateVector();
+
+export { updateVector };
 // 21. Run the main function
