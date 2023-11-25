@@ -54,31 +54,28 @@ function normalizeDocuments(docs) {
 }
 
 const test_data = [
-  { chatRoomId: 1, chat: '이거 뭔가요', isQuestion: 'true' },
-  { chatRoomId: 1, chat: '이건 또 뭔가요', isQuestion: 'true' },
-  { chatRoomId: 1, chat: '이건 이겁니다', isQuestion: 'false' },
-  { chatRoomId: 1, chat: '이건 이겁니다', isQuestion: 'false' },
-  { chatRoomId: 1, chat: '이건 뭔가요', isQuestion: 'true' },
-  { chatRoomId: 1, chat: '이건 이겁니다', isQuestion: 'false' },
-  { chatRoomId: 2, chat: 'hihihi', isQuestion: 'true' },
-  { chatRoomId: 2, chat: 'nonono', isQuestion: 'false' },
-  { chatRoomId: 3, chat: 'hihihi', isQuestion: 'true' },
-  { chatRoomId: 3, chat: 'hihihi', isQuestion: 'true' },
-  { chatRoomId: 3, chat: 'nonono', isQuestion: 'false' },
-  { chatRoomId: 4, chat: '대답을 못 받은 질문', isQuestion: 'true' },
-  { chatRoomId: 4, chat: '답', isQuestion: 'false' },
-  { chatRoomId: 4, chat: '대답을 못 받은 질문', isQuestion: 'true' },
-  { chatRoomId: 5, chat: '대답을 못 받은 질문', isQuestion: 'true' },
-  { chatRoomId: 5, chat: '답', isQuestion: 'false' },
+  { chatroomid: 1, chat: '이거 뭔가요', isQuestion: true },
+  { chatroomid: 1, chat: '이건 또 뭔가요', isQuestion: false },
+  { chatroomid: 1, chat: '이건 이겁니다', isQuestion: true },
+  { chatroomid: 1, chat: '이건 이겁니다', isQuestion: false },
+  { chatroomid: 1, chat: '이건 뭔가요', isQuestion: true },
+  { chatroomid: 1, chat: '이건 이겁니다', isQuestion: false },
+  { chatroomid: 2, chat: 'hihihi', isQuestion: true },
+  { chatroomid: 2, chat: 'nonono', isQuestion: false },
+  { chatroomid: 3, chat: 'hihihi', isQuestion: true },
+  { chatroomid: 3, chat: 'hihihi', isQuestion: true },
+  { chatroomid: 3, chat: 'nonono', isQuestion: false },
+  { chatroomid: 4, chat: '대답을 못 받은 질문', isQuestion: true },
+  { chatroomid: 4, chat: '답', isQuestion: false },
+  { chatroomid: 4, chat: '대답을 못 받은 질문', isQuestion: true },
+  { chatroomid: 5, chat: '대답을 못 받은 질문', isQuestion: true },
 ];
-
 function formatChatData(chatData) {
-  // 채팅방 ID별로 데이터를 그룹화합니다.
   const groupedByRoom = chatData.reduce((acc, item) => {
-    if (!acc[item.chatRoomId]) {
-      acc[item.chatRoomId] = [];
+    if (!acc[item.chatroomid]) {
+      acc[item.chatroomid] = [];
     }
-    acc[item.chatRoomId].push(item);
+    acc[item.chatroomid].push(item);
     return acc;
   }, {});
 
@@ -86,35 +83,40 @@ function formatChatData(chatData) {
 
   Object.values(groupedByRoom).forEach((chatItems) => {
     let currentGroup = [];
-    let isAnswerFound = false;
+    let groups = [];
 
-    chatItems.forEach((item, index, array) => {
-      // 현재 항목이 질문일 때, 이전 그룹을 결과에 추가하고 새 그룹을 시작합니다.
-      if (item.isQuestion === 'true') {
-        if (isAnswerFound) {
-          result.push(currentGroup.join(', '));
-          currentGroup = [];
-          isAnswerFound = false;
-        }
-      } else {
-        // 답변을 찾았다고 표시합니다.
-        isAnswerFound = true;
+    chatItems.forEach((item) => {
+      const isQuestion = item.isQuestion;
+      const prefix = isQuestion ? '질문: ' : '답변: ';
+
+      // 답변 다음에 새로운 질문이 나오면 현재 그룹을 결과에 추가하고 새 그룹을 시작합니다.
+      if (
+        isQuestion &&
+        currentGroup.length > 0 &&
+        currentGroup[currentGroup.length - 1].startsWith('답변:')
+      ) {
+        groups.push(currentGroup);
+        currentGroup = [];
       }
 
-      // 현재 항목을 그룹에 추가합니다.
-      const prefix = item.isQuestion === 'true' ? '질문: ' : '답변: ';
       currentGroup.push(prefix + item.chat);
-
-      // 마지막 항목이면 그룹을 결과에 추가합니다.
-      const isLastItem = index === array.length - 1;
-      if (isLastItem && isAnswerFound) {
-        result.push(currentGroup.join(', '));
-      }
     });
+
+    // 마지막 그룹을 추가합니다.
+    if (currentGroup.length > 0) {
+      groups.push(currentGroup);
+    }
+
+    // 질문만으로 이루어진 그룹을 제거합니다.
+    groups = groups.filter((group) => group.some((c) => c.startsWith('답변:')));
+
+    // 최종 결과에 추가합니다.
+    groups.forEach((group) => result.push(group.join(', ')));
   });
 
   return result;
 }
+
 function joinChatsAsString(chats) {
   return chats.join('\n');
 }
@@ -143,7 +145,6 @@ function writeToFile(filePath, data) {
 const updateVector = async (OPENAI_API_KEY, chat_data) => {
   const formattedChatData = formatChatData(chat_data);
   const dataToWrite = joinChatsAsString(formattedChatData);
-
   // 파일 작성 작업이 완료될 때까지 기다립니다.
   await writeToFile(txtPath, dataToWrite);
 

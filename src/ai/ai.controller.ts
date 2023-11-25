@@ -19,6 +19,8 @@ export class AiController {
     await import('./ai.mjs').then(async (aiModule) => {
       answer = await aiModule.run(question, process.env.OPENAI_API_KEY);
     });
+
+    this.aiService.handleCron();
     console.log(answer);
     res.send(answer);
   }
