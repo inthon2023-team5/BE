@@ -13,8 +13,10 @@ export class qaChatEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
-  isQuestion: boolean;
+  @Column({
+    nullable: true,
+  })
+  isQuestion?: boolean;
 
   @Column()
   questionId: number;
