@@ -23,11 +23,15 @@ import { JwtPayload } from 'src/interfaces/jwt.payload';
 import { QuestionDto, QuestionListDto } from './dtos/question.dto';
 import { Category } from 'src/common/enums';
 import { QaChatDto } from './dtos/chat.dto';
+import { UserService } from 'src/user/user.service';
 
 @Controller('qa')
 @ApiTags('Q&A')
 export class QaController {
-  constructor(private readonly qaService: QaService) {}
+  constructor(
+    private readonly qaService: QaService,
+    private readonly userService: UserService,
+  ) {}
 
   //@UseGuards(AuthGuard('access'))
   @Get('/list')
@@ -175,6 +179,7 @@ export class QaController {
   ) {
     const { id } = req.user as JwtPayload;
     try {
+      const profile = await this.userService.getProfile(id);
       const chats = await this.qaService.getQaChats(qaId);
       return res.json(chats);
     } catch (error) {
@@ -207,11 +212,5 @@ export class QaController {
       console.log(error);
       return res.status(error.status).json(error);
     }
-  }
-
-  // TEST
-  @Get()
-  async testChunk() {
-    this.qaService.chunkQA();
   }
 }
