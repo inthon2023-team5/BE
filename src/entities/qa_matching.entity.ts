@@ -13,6 +13,9 @@ export class qaMatchingEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column()
+  question: string;
+
   @Column({
     type: 'enum',
     enum: State,
@@ -32,4 +35,7 @@ export class qaMatchingEntity {
   @ManyToOne(() => UserEntity, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
   @JoinColumn()
   answer_user: UserEntity;
+
+  @Column()
+  createdAt: Date;
 }

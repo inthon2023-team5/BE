@@ -8,6 +8,10 @@ export class UserDto {
   @ApiProperty({ description: 'name' })
   name: string;
 
+  @IsString()
+  @ApiProperty({ description: 'nickname' })
+  nickname: string;
+
   @IsEmail()
   @ApiProperty({ description: 'email' })
   email: string;
@@ -27,6 +31,7 @@ export class UserDto {
   static ToDto(user: UserEntity): UserDto {
     return {
       name: user.name,
+      nickname: user.nickname,
       email: user.email,
       univId: user.univId,
       grade: user.grade,

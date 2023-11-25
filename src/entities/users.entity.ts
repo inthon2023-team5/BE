@@ -6,13 +6,16 @@ export class UserEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ length: 255 })
+  @Column()
+  nickname: string;
+
+  @Column()
   name: string;
 
-  @Column({ length: 255 })
+  @Column()
   email: string;
 
-  @Column({ length: 255 })
+  @Column()
   univId: string;
 
   @Column()
