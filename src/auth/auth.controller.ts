@@ -24,7 +24,7 @@ export class AuthController {
       return res.sendStatus(201);
     } catch (error) {
       console.log(error);
-      return res.send(error);
+      return res.status(error.status).json(error);
     }
   }
 
@@ -49,7 +49,7 @@ export class AuthController {
       return res.json({ token: token, userInfo: UserDto.ToDto(user) });
     } catch (error) {
       console.log(error);
-      return res.send(error);
+      return res.status(error.status).json(error);
     }
   }
 

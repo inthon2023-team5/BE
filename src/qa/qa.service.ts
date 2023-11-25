@@ -35,7 +35,6 @@ export class QaService {
       createdAt: new Date(new Date().getTime() + 9 * 60 * 60 * 1000),
     });
     const qaMatchEntity = await this.matchRepo.save(qaEntity);
-
     this.postQaChat(
       {
         qaId: qaMatchEntity.id,
@@ -62,6 +61,10 @@ export class QaService {
   }
 
   async changeQaState(id: number, state: State) {
+    if (state == 3) {
+      const qaEntity = await this.matchRepo.findOne({ where: { id: id } });
+      //await this.userService.updatePoint(qaEntity.question_user.id, 10);
+    }
     this.matchRepo.update(id, { state: state });
   }
 
@@ -109,6 +112,18 @@ export class QaService {
       user: userId,
       createdAt: new Date(new Date().getTime() + 9 * 60 * 60 * 1000),
     } as DeepPartial<qaChatEntity>);
-    await this.chatRepo.save(qaChatEntity);
+    const ChatEntity = await this.chatRepo.save(qaChatEntity);
+    ChatEntity.questionId = ChatEntity.id;
+    this.chatRepo.save(ChatEntity);
+  }
+
+  async chunkQA() {
+    const qaChunks = await this.chatRepo
+      .query(`SELECT qme.id AS ChatRoomId, qce.chat, qce."isQuestion"
+    FROM qa_chat_entity qce
+    JOIN qa_matching_entity qme ON qce."qaMatchId" = qme.id
+    WHERE qce."userId" IS NOT NULL
+    ORDER BY qme.id, qce."createdAt";`);
+    return qaChunks;
   }
 }

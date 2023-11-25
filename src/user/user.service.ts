@@ -79,4 +79,29 @@ export class UserService {
     });
     return token;
   }
+
+  async updatePoint(id: number, point: number) {
+    const user = await this.userRepo.findOne({ where: { id: id } });
+    user.point += point;
+    if (user.point < 0) {
+      return false;
+    }
+    return await this.userRepo.save(user);
+  }
+
+  async getUserQuestion(userId: number) {
+    const user = await this.userRepo.findOne({ where: { id: userId } });
+    const questions = await this.matchRepo.find({
+      where: { question_user: user },
+    });
+    return questions;
+  }
+
+  async getUserAnswer(userId: number) {
+    const user = await this.userRepo.findOne({ where: { id: userId } });
+    const answers = await this.matchRepo.find({
+      where: { answer_user: user },
+    });
+    return answers;
+  }
 }
