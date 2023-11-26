@@ -203,7 +203,7 @@ export class QaController {
   }
 
   @UseGuards(AuthGuard('access'))
-  @Post('/chat/:qaId')
+  @Post('/chat')
   @ApiOperation({
     summary: 'Q&A 채팅',
     description: 'Q&A 채팅 보내기',
