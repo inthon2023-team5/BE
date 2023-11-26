@@ -2,6 +2,7 @@ export enum Category {
   School = 'SCHOOL',
   Future = 'FUTURE',
   Graduate = 'GRADUATE',
+  COURSE = 'COURSE',
   OperatingSystem = 'OS',
   ComputerArchitecture = 'CA',
   Network = 'NETWORK',

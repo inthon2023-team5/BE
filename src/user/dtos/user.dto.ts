@@ -66,6 +66,7 @@ export class LoginDto extends PickType(SignupDto, [
 export class ProfileDto extends PickType(UserDto, [
   'nickname',
   'grade',
+  'rank',
 ] as const) {
   @ValidateIf((o) => o.top3 !== undefined && o.top3 !== null)
   @IsArray()
@@ -82,6 +83,7 @@ export class ProfileDto extends PickType(UserDto, [
     return {
       nickname: user.nickname,
       grade: user.grade,
+      rank: user.rank,
       top3: top3 ?? [],
     };
   }
