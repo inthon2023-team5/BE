@@ -5,6 +5,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { In } from 'typeorm';
 import { Category, State } from 'src/common/enums';
 import { qaChatEntity, qaMatchingEntity } from 'src/entities';
 import { Repository, DeepPartial } from 'typeorm';
@@ -21,6 +22,18 @@ export class QaService {
     private readonly matchRepo: Repository<qaMatchingEntity>,
     private readonly userService: UserService,
   ) {}
+
+  async getOtherUserInQa(qaId: number, userId: number) {
+    const qaRoom = await this.matchRepo.findOne({
+      where: { id: qaId },
+      relations: ['question_user', 'answer_user'],
+    });
+    if (qaRoom.question_user.id == userId) {
+      return qaRoom.answer_user.id;
+    } else {
+      return qaRoom.question_user.id;
+    }
+  }
 
   async postQuestion(questionDto: QuestionDto, questionUser: number) {
     const { question, category } = questionDto;
@@ -76,6 +89,19 @@ export class QaService {
   }
 
   async getQuestionList(category: Category) {
+    if (category == 'COURSE') {
+      const courses = ['OS', 'CA', 'NETWORK', 'ALGORITHM', 'DS', 'DB', 'AI'];
+      const questions = await this.matchRepo.find({
+        where: { category: In(courses), state: 1 },
+        relations: ['question_user'],
+      });
+      const questionList = await Promise.all(
+        questions.map(async (question) => {
+          return await QuestionListDto.ToDto(question);
+        }),
+      );
+      return questionList;
+    }
     const questions = await this.matchRepo.find({
       where: { category: category, state: 1 },
       relations: ['question_user'],

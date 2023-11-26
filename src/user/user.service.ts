@@ -82,30 +82,24 @@ export class UserService {
 
   async getProfile(id: number) {
     const user = await this.userRepo.findOne({ where: { id: id } });
-    /*
-    const top3 = await this.matchRepo.query(
-      `SELECT category, COUNT(*) as count
-      FROM qa_matching_entity
-      WHERE "answerUserId" = $1 AND state = 3
-      GROUP BY category
-      HAVING COUNT(*) >= 5
-      ORDER BY COUNT(*) DESC
-      LIMIT 3`,
-      [id],
-    );
-    */
-    const top3 = await this.matchRepo
+    const top3Categories = await this.matchRepo
       .createQueryBuilder('match')
       .select('match.category', 'category')
       .addSelect('COUNT(*)', 'count')
       .where('match.answer_user = :user', { user: user.id })
       .andWhere("match.state = '3'")
       .groupBy('match.category')
-      .having('COUNT(*) >= 5')
+      .having('COUNT(*) >= 1')
       .orderBy('count', 'DESC')
       .limit(3)
       .getRawMany();
-    console.log(top3);
+    const top3 = await Promise.all(
+      top3Categories.map(async (topCategory) => {
+        const { category } = topCategory;
+        return category;
+      }),
+    );
+    return ProfileDto.ToDto(user, top3);
   }
 
   async updatePoint(id: number, point: number) {
