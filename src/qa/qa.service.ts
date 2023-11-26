@@ -164,14 +164,4 @@ export class QaService {
     } as DeepPartial<qaChatEntity>);
     await this.chatRepo.save(qaChatEntity);
   }
-
-  async chunkQA() {
-    const qaChunks = await this.chatRepo
-      .query(`SELECT qme.id AS ChatRoomId, qce.chat, qce."isQuestion"
-    FROM qa_chat_entity qce
-    JOIN qa_matching_entity qme ON qce."qaMatchId" = qme.id
-    WHERE qce."userId" IS NOT NULL
-    ORDER BY qme.id, qce."createdAt";`);
-    return qaChunks;
-  }
 }

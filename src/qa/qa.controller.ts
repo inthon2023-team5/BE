@@ -90,7 +90,15 @@ export class QaController {
     @Res() res: Response,
   ) {
     const { id } = req.user as JwtPayload;
+    const { question } = questionDto;
     const qaId = await this.qaService.postQuestion(questionDto, id);
+    const answer = await this.aiService.questionToAi(question);
+    console.log(answer);
+    const chats = await this.qaService.postQaChat(
+      { qaId: qaId, isQuestion: false, chat: answer, questionId: null },
+      null,
+    );
+    console.log(chats);
     return res.status(201).json({ id: qaId });
   }
 
@@ -223,12 +231,15 @@ export class QaController {
       const chats = await this.qaService.postQaChat(qaChatDto, id);
       const { qaId, isQuestion, chat } = qaChatDto;
       const state = await this.qaService.getQaState(qaId);
+      console.log(state);
       if (isQuestion && state == 0) {
         const answer = await this.aiService.questionToAi(chat);
+        console.log(answer);
         const chats = await this.qaService.postQaChat(
           { qaId: qaId, isQuestion: false, chat: answer, questionId: null },
           null,
         );
+        console.log(chats);
         return res.json(chats);
       }
       return res.json(chats);
