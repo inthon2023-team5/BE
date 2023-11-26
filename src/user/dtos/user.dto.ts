@@ -65,6 +65,7 @@ export class LoginDto extends PickType(SignupDto, [
 
 export class ProfileDto extends PickType(UserDto, [
   'nickname',
+  'univId',
   'grade',
   'rank',
 ] as const) {
@@ -82,6 +83,7 @@ export class ProfileDto extends PickType(UserDto, [
   static ToDto(user: UserEntity, top3: Category[]): ProfileDto {
     return {
       nickname: user.nickname,
+      univId: user.univId,
       grade: user.grade,
       rank: user.rank,
       top3: top3 ?? [],
