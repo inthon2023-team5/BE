@@ -47,7 +47,11 @@ export class QaService {
         userId: qaRoom.answer_user ? qaRoom.answer_user.id : null,
       };
     } else {
-      return { isQuestionUser: false, userId: qaRoom.question_user.id };
+      return {
+        isQuestionUser: false,
+        userId: qaRoom.question_user.id,
+        state: qaRoom.state,
+      };
     }
   }
 

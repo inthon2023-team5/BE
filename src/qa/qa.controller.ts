@@ -189,20 +189,23 @@ export class QaController {
   ) {
     const { id } = req.user as JwtPayload;
     try {
-      const { isQuestionUser, userId } = await this.qaService.getOtherUserInQa(
-        qaId,
-        id,
-      );
+      const { state, isQuestionUser, userId } =
+        await this.qaService.getOtherUserInQa(qaId, id);
       const chats = await this.qaService.getQaChats(qaId);
       if (userId != null || userId != undefined) {
         const profile = await this.userService.getProfile(userId);
         return res.json({
           profile: profile,
+          state: state,
           isQuestionUser: isQuestionUser,
           chats: chats,
         });
       } else {
-        return res.json({ isQuestionUser: isQuestionUser, chats: chats });
+        return res.json({
+          state: state,
+          isQuestionUser: isQuestionUser,
+          chats: chats,
+        });
       }
     } catch (error) {
       console.log(error);
