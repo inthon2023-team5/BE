@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { Cron } from '@nestjs/schedule';
+//import { Cron } from '@nestjs/schedule';
 import { QaService } from 'src/qa/qa.service';
 
 @Injectable()
 export class AiService {
   constructor(private readonly qaService: QaService) {}
 
-  @Cron('0 19 * * *')
+  //@Cron('0 19 * * *')
   async handleCron() {
     await import('./updateVector.mjs').then(async (aiModule) => {
       const chatdata = await this.qaService.chunkQA();

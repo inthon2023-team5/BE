@@ -58,14 +58,17 @@ export class UserService {
     const user = await this.userRepo.findOne({
       where: { univId: univId },
     });
-
-    if (
-      !user ||
-      user == undefined ||
-      (await !bcrypt.compare(password, user.password))
-    ) {
+    console.log(await bcrypt.compare(password, user.password));
+    if (!user || user == undefined) {
       throw new UnauthorizedException();
     }
+    const cmpPw = await bcrypt.compare(password, user.password);
+    if (!cmpPw) {
+      {
+        throw new UnauthorizedException();
+      }
+    }
+
     return await this.getToken(user.id);
   }
 
