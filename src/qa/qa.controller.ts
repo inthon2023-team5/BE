@@ -214,6 +214,48 @@ export class QaController {
   }
 
   @UseGuards(AuthGuard('access'))
+  @Get('/profile/chat/:qaId')
+  @ApiOperation({
+    summary: 'Q&A 상세',
+    description: 'Q&A 채팅 내역',
+  })
+  @ApiParam({
+    name: 'qaId',
+    type: Number,
+  })
+  @ApiCreatedResponse({ description: 'success' })
+  async getQaChatL(
+    @Req() req: Request,
+    @Param('qaId') qaId: number,
+    @Res() res: Response,
+  ) {
+    const { id } = req.user as JwtPayload;
+    try {
+      const { state, isQuestionUser, userId } =
+        await this.qaService.getOtherUserInQa(qaId, id);
+      const chats = await this.qaService.getQaChats(qaId);
+      if (userId != null || userId != undefined) {
+        const profile = await this.userService.getProfile(userId);
+        return res.json({
+          profile: profile,
+          state: state,
+          isQuestionUser: isQuestionUser,
+          chats: chats,
+        });
+      } else {
+        return res.json({
+          state: state,
+          isQuestionUser: isQuestionUser,
+          chats: chats,
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      return res.status(error.status).json(error);
+    }
+  }
+
+  @UseGuards(AuthGuard('access'))
   @Post('/chat')
   @ApiOperation({
     summary: 'Q&A 채팅',
