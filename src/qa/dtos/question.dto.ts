@@ -13,7 +13,7 @@ export class QADto {
   question: string;
 
   @IsEnum(Category)
-  @ApiProperty({ description: 'category', type: Category })
+  @ApiProperty({ description: 'category', type: () => Category })
   category: Category;
 
   @IsDate()
@@ -31,7 +31,7 @@ export class QuestionListDto extends QADto {
   univId: string;
 
   @IsEnum(Grade)
-  @ApiProperty({ description: 'grade', type: Grade })
+  @ApiProperty({ description: 'grade', type: () => Grade })
   grade: Grade;
 
   static ToDto(qaEntity: qaMatchingEntity): QuestionListDto {
