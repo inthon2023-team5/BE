@@ -16,7 +16,8 @@ export class UserController {
   async userInfo(@Req() req: Request, @Res() res: Response) {
     const { id } = req.user as JwtPayload;
     const user = await this.userService.findById(id);
-    return res.json(UserDto.ToDto(user));
+    const top3 = await this.userService.getTop3(id);
+    return res.json({ ...user, top3 });
   }
 
   @UseGuards(AuthGuard('access'))

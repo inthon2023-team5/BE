@@ -85,11 +85,16 @@ export class UserService {
 
   async getProfile(id: number) {
     const user = await this.userRepo.findOne({ where: { id: id } });
+    const top3 = await this.getTop3(id);
+    return ProfileDto.ToDto(user, top3);
+  }
+
+  async getTop3(id: number) {
     const top3Categories = await this.matchRepo
       .createQueryBuilder('match')
       .select('match.category', 'category')
       .addSelect('COUNT(*)', 'count')
-      .where('match.answer_user = :user', { user: user.id })
+      .where('match.answer_user = :user', { user: id })
       .andWhere("match.state = '3'")
       .groupBy('match.category')
       .having('COUNT(*) >= 1')
@@ -102,7 +107,7 @@ export class UserService {
         return category;
       }),
     );
-    return ProfileDto.ToDto(user, top3);
+    return top3;
   }
 
   async updatePoint(id: number, point: number) {
