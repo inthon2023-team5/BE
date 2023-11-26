@@ -64,7 +64,7 @@ export class QaService {
       createdAt: new Date(new Date().getTime() + 9 * 60 * 60 * 1000),
     });
     const qaMatchEntity = await this.matchRepo.save(qaEntity);
-    this.postQaChat(
+    await this.postQaChat(
       {
         qaId: qaMatchEntity.id,
         questionId: qaMatchEntity.id,
@@ -147,7 +147,7 @@ export class QaService {
     const qaMatch = await this.matchRepo.findOne({ where: { id: qaId } });
     const chats = await this.chatRepo.find({
       where: { qaMatch: qaMatch },
-      order: { questionId: 'ASC', createdAt: 'ASC' },
+      order: { createdAt: 'ASC' },
     });
     return chats;
   }
