@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Cron } from '@nestjs/schedule';
+//import { Cron } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
 import { qaChatEntity } from 'src/entities';
 import { Repository } from 'typeorm';
@@ -11,7 +11,7 @@ export class AiService {
     private readonly chatRepo: Repository<qaChatEntity>,
   ) {}
 
-  @Cron('0 19 * * *')
+  //@Cron('0 19 * * *')
   async handleCron() {
     await import('./updateVector.mjs').then(async (aiModule) => {
       const chatdata = await this.chatRepo

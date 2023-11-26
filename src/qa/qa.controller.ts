@@ -201,6 +201,7 @@ export class QaController {
           chats: chats,
         });
       } else {
+        console.log(state);
         return res.json({
           state: state,
           isQuestionUser: isQuestionUser,
