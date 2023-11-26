@@ -35,9 +35,16 @@
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
     "d3-dsv": "^2.0.0",
+<<<<<<< HEAD
     "langchain": "^0.0.197-rc.1",
     "hnswlib-node": "^1.4.2",
     "install": "^0.13.0",
+=======
+    "hnswlib-node": "^1.4.2",
+    "install": "^0.13.0",
+    "langchain": "^0.0.197-rc.1",
+    "npm": "^10.2.4",
+>>>>>>> abce9ae (Fix: text parser)
     "passport-jwt": "^4.0.1",
     "pg": "^8.11.3",
     "reflect-metadata": "^0.1.13",
