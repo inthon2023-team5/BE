@@ -13,15 +13,14 @@ export class AiController {
     let answer: any;
     const { question } = req.body;
 
-    await import('./updateVector.mjs').then(async (updateVectorModule) => {
-      await updateVectorModule.updateVector(process.env.OPENAI_API_KEY);
-    });
+    // await import('./updateVector.mjs').then(async (updateVectorModule) => {
+    //   await updateVectorModule.updateVector(process.env.OPENAI_API_KEY);
+    // });
     // await import('./ai.mjs').then(async (aiModule) => {
     //   answer = await aiModule.run(question, process.env.OPENAI_API_KEY);
     // });
 
     this.aiService.handleCron();
-    console.log(answer);
-    res.send(answer);
+    res.sendStatus(200);
   }
 }

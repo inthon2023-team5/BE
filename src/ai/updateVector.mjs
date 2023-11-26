@@ -29,7 +29,6 @@ const txtPath = path.resolve(projectRoot, './src/ai/documents/langchain.txt');
 
 dotenv.config();
 
-console.log(process.env.OPENAI_API_KEY);
 // 5. Initialize the document loader with supported file formats
 const loader = await new DirectoryLoader(dirPath, {
   '.json': (path) => new JSONLoader(path),
