@@ -28,10 +28,14 @@ export class QaService {
       where: { id: qaId },
       relations: ['question_user', 'answer_user'],
     });
+    if (!qaRoom || qaRoom == null) {
+      throw new HttpException('invalid Q&A page', 404);
+    }
+
     if (qaRoom.question_user.id == userId) {
-      return qaRoom.answer_user.id;
+      return { isQuestionUser: false, userId: qaRoom.answer_user.id };
     } else {
-      return qaRoom.question_user.id;
+      return { isQuestionUser: true, userId: qaRoom.question_user.id };
     }
   }
 
