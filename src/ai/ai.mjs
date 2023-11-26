@@ -92,58 +92,63 @@ const run = async (question, OPENAI_API_KEY) => {
 
   // 11. Check if the cost is within the acceptable limit
   if (cost <= 1) {
-    // 12. Initialize the OpenAI language model
-    const model = new OpenAI({
-      modelName: 'gpt-3.5-turbo', //gpt-3.5-turbo-instruct로 교체 가능
-      temperature: 0.2,
-      openAIApiKey: OPENAI_API_KEY,
-    });
-    // console.log(process.env.OPENAI_API_KEY);
-    let vectorStore;
-
-    // 13. Check if an existing vector store is available
-    console.log('Checking for existing vector store...');
-    if (fs.existsSync(VECTOR_STORE_PATH)) {
-      // 14. Load the existing vector store
-      console.log('Loading existing vector store...');
-      vectorStore = await HNSWLib.load(
-        VECTOR_STORE_PATH,
-        new OpenAIEmbeddings({
-          openAIApiKey: OPENAI_API_KEY,
-        }),
-      );
-      console.log('Vector store loaded.');
-    } else {
-      // 15. Create a new vector store if one does not exist
-      console.log('Creating new vector store...');
-      const textSplitter = new RecursiveCharacterTextSplitter({
-        chunkSize: 1000,
+    try {
+      // 12. Initialize the OpenAI language model
+      const model = new OpenAI({
+        modelName: 'gpt-3.5-turbo', //gpt-3.5-turbo-instruct로 교체 가능
+        temperature: 0.2,
+        openAIApiKey: OPENAI_API_KEY,
       });
-      const normalizedDocs = normalizeDocuments(docs);
-      const splitDocs = await textSplitter.createDocuments(normalizedDocs);
+      // console.log(process.env.OPENAI_API_KEY);
+      let vectorStore;
 
-      // 16. Generate the vector store from the documents
-      vectorStore = await HNSWLib.fromDocuments(
-        splitDocs,
-        new OpenAIEmbeddings({
-          openAIApiKey: OPENAI_API_KEY,
-        }),
-      );
-      // 17. Save the vector store to the specified path
-      await vectorStore.save(VECTOR_STORE_PATH);
+      // 13. Check if an existing vector store is available
+      console.log('Checking for existing vector store...');
+      if (fs.existsSync(VECTOR_STORE_PATH)) {
+        // 14. Load the existing vector store
+        console.log('Loading existing vector store...');
+        vectorStore = await HNSWLib.load(
+          VECTOR_STORE_PATH,
+          new OpenAIEmbeddings({
+            openAIApiKey: OPENAI_API_KEY,
+          }),
+        );
+        console.log('Vector store loaded.');
+      } else {
+        // 15. Create a new vector store if one does not exist
+        console.log('Creating new vector store...');
+        const textSplitter = new RecursiveCharacterTextSplitter({
+          chunkSize: 1000,
+        });
+        const normalizedDocs = normalizeDocuments(docs);
+        const splitDocs = await textSplitter.createDocuments(normalizedDocs);
 
-      console.log('Vector store created.');
+        // 16. Generate the vector store from the documents
+        vectorStore = await HNSWLib.fromDocuments(
+          splitDocs,
+          new OpenAIEmbeddings({
+            openAIApiKey: OPENAI_API_KEY,
+          }),
+        );
+        // 17. Save the vector store to the specified path
+        await vectorStore.save(VECTOR_STORE_PATH);
+
+        console.log('Vector store created.');
+      }
+
+      // 18. Create a retrieval chain using the language model and vector store
+      console.log('Creating retrieval chain...');
+      const chain = RetrievalQAChain.fromLLM(model, vectorStore.asRetriever());
+
+      // 19. Query the retrieval chain with the specified question
+      console.log('Querying chain...');
+      const res = await chain.call({ query: question });
+      console.log({ res });
+      return res;
+    } catch (error) {
+      console.log(error);
+      return '아직 질문을 받은 적 없는 내용입니다.';
     }
-
-    // 18. Create a retrieval chain using the language model and vector store
-    console.log('Creating retrieval chain...');
-    const chain = RetrievalQAChain.fromLLM(model, vectorStore.asRetriever());
-
-    // 19. Query the retrieval chain with the specified question
-    console.log('Querying chain...');
-    const res = await chain.call({ query: question });
-    console.log({ res });
-    return res;
   } else {
     // 20. If the cost exceeds the limit, skip the embedding process
     console.log('The cost of embedding exceeds $1. Skipping embeddings.');
