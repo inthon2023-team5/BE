@@ -28,11 +28,11 @@ export class UserDto {
   univId: string;
 
   @IsEnum(Grade)
-  @ApiProperty({ description: 'grade', type: () => Grade })
+  @ApiProperty({ description: 'grade' })
   grade: Grade;
 
   @IsEnum(Rank)
-  @ApiProperty({ description: 'rank', type: () => Rank })
+  @ApiProperty({ description: 'rank' })
   rank: Rank;
 
   @IsNumber()
