@@ -4,10 +4,12 @@ import { QaController } from './qa.controller';
 import { QaService } from './qa.service';
 import { qaChatEntity, qaMatchingEntity } from 'src/entities';
 import { UserModule } from 'src/user/user.module';
+import { AiModule } from 'src/ai/ai.module';
 
 @Module({
   imports: [
     UserModule,
+    AiModule,
     TypeOrmModule.forFeature([qaMatchingEntity, qaChatEntity]),
   ],
   controllers: [QaController],

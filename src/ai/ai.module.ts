@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common';
 import { AiController } from './ai.controller';
 import { AiService } from './ai.service';
-import { QaModule } from 'src/qa/qa.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { qaChatEntity } from 'src/entities';
 
 @Module({
-  imports: [QaModule],
+  imports: [TypeOrmModule.forFeature([qaChatEntity])],
   controllers: [AiController],
   providers: [AiService],
   exports: [AiService],

@@ -24,6 +24,7 @@ import { QuestionDto, QuestionListDto } from './dtos/question.dto';
 import { Category } from 'src/common/enums';
 import { QaChatDto } from './dtos/chat.dto';
 import { UserService } from 'src/user/user.service';
+import { AiService } from 'src/ai/ai.service';
 
 @Controller('qa')
 @ApiTags('Q&A')
@@ -31,6 +32,7 @@ export class QaController {
   constructor(
     private readonly qaService: QaService,
     private readonly userService: UserService,
+    private readonly aiService: AiService,
   ) {}
 
   //@UseGuards(AuthGuard('access'))
@@ -219,6 +221,15 @@ export class QaController {
     const { id } = req.user as JwtPayload;
     try {
       const chats = await this.qaService.postQaChat(qaChatDto, id);
+      const { qaId, isQuestion, chat } = qaChatDto;
+      if (isQuestion) {
+        const answer = await this.aiService.questionToAi(chat);
+        const chats = await this.qaService.postQaChat(
+          { qaId: qaId, isQuestion: false, chat: answer, questionId: null },
+          null,
+        );
+        return res.json(chats);
+      }
       return res.json(chats);
     } catch (error) {
       console.log(error);

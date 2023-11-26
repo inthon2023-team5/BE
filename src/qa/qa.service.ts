@@ -12,6 +12,7 @@ import { Repository, DeepPartial } from 'typeorm';
 import { QuestionDto, QuestionListDto } from './dtos/question.dto';
 import { UserService } from 'src/user/user.service';
 import { QaChatDto } from './dtos/chat.dto';
+import { AiService } from 'src/ai/ai.service';
 
 @Injectable()
 export class QaService {
@@ -21,6 +22,7 @@ export class QaService {
     @InjectRepository(qaMatchingEntity)
     private readonly matchRepo: Repository<qaMatchingEntity>,
     private readonly userService: UserService,
+    private readonly aiService: AiService,
   ) {}
 
   async getOtherUserInQa(qaId: number, userId: number) {
@@ -33,9 +35,12 @@ export class QaService {
     }
 
     if (qaRoom.question_user.id == userId) {
-      return { isQuestionUser: false, userId: qaRoom.answer_user.id };
+      return {
+        isQuestionUser: true,
+        userId: qaRoom.answer_user ? qaRoom.answer_user.id : null,
+      };
     } else {
-      return { isQuestionUser: true, userId: qaRoom.question_user.id };
+      return { isQuestionUser: false, userId: qaRoom.question_user.id };
     }
   }
 
@@ -150,9 +155,7 @@ export class QaService {
       questionId: questionId ?? null,
       createdAt: new Date(new Date().getTime() + 9 * 60 * 60 * 1000),
     } as DeepPartial<qaChatEntity>);
-    const ChatEntity = await this.chatRepo.save(qaChatEntity);
-    ChatEntity.questionId = ChatEntity.id;
-    this.chatRepo.save(ChatEntity);
+    return await this.chatRepo.save(qaChatEntity);
   }
 
   async chunkQA() {
