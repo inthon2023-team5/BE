@@ -25,6 +25,13 @@ export class QaService {
     private readonly aiService: AiService,
   ) {}
 
+  async getQaState(qaId: number) {
+    const qaRoom = await this.matchRepo.findOne({
+      where: { id: qaId },
+    });
+    return qaRoom.state;
+  }
+
   async getOtherUserInQa(qaId: number, userId: number) {
     const qaRoom = await this.matchRepo.findOne({
       where: { id: qaId },
@@ -155,7 +162,7 @@ export class QaService {
       questionId: questionId ?? null,
       createdAt: new Date(new Date().getTime() + 9 * 60 * 60 * 1000),
     } as DeepPartial<qaChatEntity>);
-    return await this.chatRepo.save(qaChatEntity);
+    await this.chatRepo.save(qaChatEntity);
   }
 
   async chunkQA() {

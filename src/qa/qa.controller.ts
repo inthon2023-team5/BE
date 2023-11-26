@@ -222,7 +222,8 @@ export class QaController {
     try {
       const chats = await this.qaService.postQaChat(qaChatDto, id);
       const { qaId, isQuestion, chat } = qaChatDto;
-      if (isQuestion) {
+      const state = await this.qaService.getQaState(qaId);
+      if (isQuestion && state == 0) {
         const answer = await this.aiService.questionToAi(chat);
         const chats = await this.qaService.postQaChat(
           { qaId: qaId, isQuestion: false, chat: answer, questionId: null },
