@@ -93,9 +93,9 @@ export class QaController {
     const { question } = questionDto;
     const qaId = await this.qaService.postQuestion(questionDto, id);
     const answer = await this.aiService.questionToAi(question);
-    console.log(answer);
+    const { text } = answer;
     const chats = await this.qaService.postQaChat(
-      { qaId: qaId, isQuestion: false, chat: answer, questionId: null },
+      { qaId: qaId, isQuestion: false, chat: text, questionId: null },
       null,
     );
     console.log(chats);
@@ -231,18 +231,17 @@ export class QaController {
       const chats = await this.qaService.postQaChat(qaChatDto, id);
       const { qaId, isQuestion, chat } = qaChatDto;
       const state = await this.qaService.getQaState(qaId);
-      console.log(state);
       if (isQuestion && state == 0) {
         const answer = await this.aiService.questionToAi(chat);
-        console.log(answer);
+        const { text } = answer;
         const chats = await this.qaService.postQaChat(
-          { qaId: qaId, isQuestion: false, chat: answer, questionId: null },
+          { qaId: qaId, isQuestion: false, chat: text, questionId: null },
           null,
         );
         console.log(chats);
-        return res.json(chats);
+        return res.sendStatus(201);
       }
-      return res.json(chats);
+      return res.sendStatus(201);
     } catch (error) {
       console.log(error);
       return res.status(error.status).json(error);
