@@ -157,6 +157,14 @@ export class QaService {
     return chats;
   }
 
+  async isQuestion(qaId: number, userId: number) {
+    const qaRoom = await this.matchRepo.findOne({
+      where: { id: qaId },
+      relations: ['question_user'],
+    });
+    return qaRoom.question_user.id == userId;
+  }
+
   async postQaChat(qaChat: QaChatDto, userId: number) {
     const { chat, qaId, questionId } = qaChat;
     const qaRoom = await this.matchRepo.findOne({

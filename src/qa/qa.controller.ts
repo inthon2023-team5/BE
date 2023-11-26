@@ -201,7 +201,6 @@ export class QaController {
           chats: chats,
         });
       } else {
-        console.log(state);
         return res.json({
           state: state,
           isQuestionUser: isQuestionUser,
@@ -233,8 +232,9 @@ export class QaController {
     const { id } = req.user as JwtPayload;
     try {
       const chats = await this.qaService.postQaChat(qaChatDto, id);
-      const { qaId, isQuestion, chat } = qaChatDto;
+      const { qaId, chat } = qaChatDto;
       const state = await this.qaService.getQaState(qaId);
+      const isQuestion = await this.qaService.isQuestion(qaId, id);
       if (isQuestion && state == 0) {
         const answer = await this.aiService.questionToAi(chat);
         const { text } = answer;
