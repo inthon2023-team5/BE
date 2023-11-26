@@ -1,7 +1,7 @@
 import { IsEnum, IsString, IsNumber, IsDate } from 'class-validator';
 import { ApiProperty, PickType } from '@nestjs/swagger';
 import { qaMatchingEntity } from 'src/entities';
-import { Category } from 'src/common/enums';
+import { Category, Grade } from 'src/common/enums';
 
 export class QADto {
   @IsNumber()
@@ -26,10 +26,20 @@ export class QuestionListDto extends QADto {
   @ApiProperty({ description: 'nickname' })
   nickname: string;
 
+  @IsString()
+  @ApiProperty({ description: 'univId' })
+  univId: string;
+
+  @IsEnum(Grade)
+  @ApiProperty({ description: 'grade' })
+  grade: Grade;
+
   static ToDto(qaEntity: qaMatchingEntity): QuestionListDto {
     return {
       id: qaEntity.id,
       nickname: qaEntity.question_user.nickname,
+      univId: qaEntity.question_user.univId,
+      grade: qaEntity.question_user.grade,
       question: qaEntity.question,
       category: qaEntity.category,
       createdAt: qaEntity.createdAt,
