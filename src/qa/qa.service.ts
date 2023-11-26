@@ -153,9 +153,13 @@ export class QaService {
   }
 
   async postQaChat(qaChat: QaChatDto, userId: number) {
-    const { isQuestion, chat, qaId, questionId } = qaChat;
+    const { chat, qaId, questionId } = qaChat;
+    const qaRoom = await this.matchRepo.findOne({
+      where: { id: qaId },
+      relations: ['question_user'],
+    });
     const qaChatEntity = await this.chatRepo.create({
-      isQuestion: isQuestion,
+      isQuestion: userId == qaRoom.question_user.id,
       chat: chat,
       qaMatch: qaId,
       user: userId,
